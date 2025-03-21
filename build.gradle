@@ -6,6 +6,10 @@ plugins {
 group rootProject.properties['group']
 version rootProject.properties['version']
 
+ext {
+    jdaVersion = "5.0.0-beta.21"
+}
+
 repositories {
     mavenCentral()
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -22,23 +26,38 @@ dependencies {
     // LuckPerms
     compileOnly 'net.luckperms:api:5.4'
 
-    // TAB
-    compileOnly 'me.neznamy:tab-api:4.0.2'
-
     // StreamlineCore
     boolean includeBapi = rootProject.properties['include-bapi'].toString().toBoolean()
     if (includeBapi) {
-        compileOnly 'com.github.streamline-essentials.StreamlineCore:StreamlineCore-BAPI:main-SNAPSHOT'
-        annotationProcessor 'com.github.streamline-essentials.StreamlineCore:StreamlineCore-BAPI:main-SNAPSHOT'
+        compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
+        annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
     } else {
-        compileOnly 'com.github.streamline-essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT'
-        annotationProcessor 'com.github.streamline-essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT'
+        compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
+        annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
     }
+
+    // JDA
+    shadow(implementation("net.dv8tion:JDA:$jdaVersion").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
+    shadow(implementation("club.minnced:discord-webhooks:0.8.4").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
+//    compileOnly("net.dv8tion:JDA:$jdaVersion").exclude(group: "org.slf4j").exclude(group: "org.slf4j")
+//    compileOnly("club.minnced:discord-webhooks:0.8.4").exclude(group: "org.slf4j").exclude(group: "org.slf4j")
+
+    // StreamlineMessaging
+    compileOnly('com.github.Streamline-Essentials:StreamlineMessaging:master-SNAPSHOT')
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.incremental = true
+
+    // Set this to the version of java you want to use,
+    // the minimum required for JDA is 1.8
+    sourceCompatibility = "1.8"
 }
 
 shadowJar {
